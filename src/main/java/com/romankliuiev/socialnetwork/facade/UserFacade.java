@@ -2,11 +2,13 @@ package com.romankliuiev.socialnetwork.facade;
 
 import com.romankliuiev.socialnetwork.dto.user.UserRegisterDTO;
 import com.romankliuiev.socialnetwork.data.user.User;
+import com.romankliuiev.socialnetwork.facade.exception.NullTokenException;
 import com.romankliuiev.socialnetwork.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserFacade {
@@ -37,5 +39,14 @@ public class UserFacade {
 
     public ResponseEntity<UserRegisterDTO> getMyUser(Authentication authentication) {
         return ResponseEntity.ok(UserToUserRegisterDTO((User) authentication.getPrincipal()));
+    }
+
+    @Transactional
+    public ResponseEntity<UserRegisterDTO> updateUser(UserRegisterDTO userRegisterDTO, Authentication authentication) {
+        if (authentication == null) {
+            throw new NullTokenException("Token is null");
+        }
+        User user = UserRegisterToUser(userRegisterDTO);
+        return ResponseEntity.ok(UserToUserRegisterDTO(userService.updateUser(user, authentication.getName())));
     }
 }

@@ -14,5 +14,10 @@ public interface UserRepo extends JpaRepository<User, Long> {
 //    List<User> findAll(Pageable pageable);
     List<User> findAllByBirthDate(LocalDate birthDate);
     List<User> findAllByIsActive(Boolean isActive);
+    Boolean existsByUsernameOrEmail(String username, String email);
+    Boolean existsByUsername(String username);
+    Boolean existsByEmail(String email);
+
+
 }
 

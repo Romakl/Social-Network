@@ -14,5 +14,3 @@ private String username;
     private String lastName;
     private LocalDate birthDate;
 }
-
-// json

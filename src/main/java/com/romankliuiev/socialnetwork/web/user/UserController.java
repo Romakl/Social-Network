@@ -27,4 +27,9 @@ public class UserController {
         return userFacade.getMyUser(authentication);
     }
 
+    @PutMapping
+    public ResponseEntity<UserRegisterDTO> updateUser(@RequestBody UserRegisterDTO userRegisterDTO, Authentication authentication) {
+        return userFacade.updateUser(userRegisterDTO, authentication);
+    }
+
 }

@@ -45,12 +45,10 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         }
         String username = loginInfo.getUsername();
         String password = loginInfo.getPassword();
-        log.info("Attempting authentication for user: "+username  + " with password: "+password);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
         try {
             return authenticationManager.authenticate(token);
         } catch (Exception e) {
-            log.error("Authentication failed for user: {}", username);
             throw new UsernameNotFoundException("Authentication failed for user: " + username);
         }
     }
@@ -71,8 +69,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     }
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        log.error("Authentication failed for user: {}", failed.getMessage());
-        response.setStatus(401);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
     public static String generateAccessToken(HttpServletRequest request, String username, List<String> roles) {
         Long expirationTime = System.currentTimeMillis() + 1000 * Long.parseLong(JWT_EXPIRATION);

@@ -52,7 +52,7 @@ public class AuthController {
                 }
 
                 User user = userService.getUserByUsername(decodedJWT.getSubject());
-                List<String> roles = user.getRoles().stream().map(role -> role.getName().name()).toList();
+                List<String> roles = user.getRoles().stream().map(Enum::name).toList();
 
                 String accessToken = CustomAuthenticationFilter.generateAccessToken(request, user.getUsername(), roles);
                 refreshToken = CustomAuthenticationFilter.generateRefreshToken(request, user.getUsername(), roles);
