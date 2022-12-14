@@ -1,5 +1,9 @@
 package com.romankliuiev.socialnetwork.data.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.romankliuiev.socialnetwork.data.Conversation;
+import com.romankliuiev.socialnetwork.data.Followers;
+import com.romankliuiev.socialnetwork.data.content.MediaContent;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +66,16 @@ public class User {
     private OffsetDateTime created;
 
     private OffsetDateTime updated;
+
+    @OneToMany(mappedBy = "to", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Followers> followers;
+    @OneToMany(mappedBy = "from", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Followers> following;
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MediaContent> mediaContent;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "participants", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Conversation> conversations;
 
     @PrePersist
     public void prePersist() {

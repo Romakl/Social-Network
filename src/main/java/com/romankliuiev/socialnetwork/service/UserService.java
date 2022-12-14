@@ -1,14 +1,18 @@
 package com.romankliuiev.socialnetwork.service;
 
+import com.romankliuiev.socialnetwork.data.Followers;
 import com.romankliuiev.socialnetwork.data.user.RoleName;
+import com.romankliuiev.socialnetwork.dto.user.UserShortDTO;
 import com.romankliuiev.socialnetwork.facade.exception.UserAlreadyExists;
 import com.romankliuiev.socialnetwork.data.user.User;
+import com.romankliuiev.socialnetwork.repo.FollowersRepo;
 import com.romankliuiev.socialnetwork.repo.UserRepo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,11 +29,13 @@ import java.util.*;
 public class UserService implements UserDetailsService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
+    private final FollowersRepo followersRepo;
 
-    public UserService(UserRepo userRepo, @Lazy PasswordEncoder passwordEncoder) {
+    public UserService(UserRepo userRepo, @Lazy PasswordEncoder passwordEncoder, FollowersRepo followersRepo) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
 
+        this.followersRepo = followersRepo;
     }
 
     @Transactional
@@ -87,4 +93,18 @@ public class UserService implements UserDetailsService {
         return emptyNames.toArray(result);
     }
 
+    public List<UserShortDTO> getFollowers(int page, int size, String username) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        List<UserShortDTO> following = new ArrayList<>();
+        List<Followers> followingList = followersRepo.findByFrom(user, pageRequest);
+        followingList.stream().map(Followers::getTo).forEach(user1 -> {
+            UserShortDTO personBasicPublicDTO = new UserShortDTO();
+            BeanUtils.copyProperties(user1, personBasicPublicDTO);
+            following.add(personBasicPublicDTO);
+        });
+        return following;
+    }
 }
+
+
