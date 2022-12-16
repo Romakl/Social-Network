@@ -6,6 +6,7 @@ import com.romankliuiev.socialnetwork.dto.user.UserShortDTO;
 import com.romankliuiev.socialnetwork.facade.exception.NullTokenException;
 import com.romankliuiev.socialnetwork.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,21 @@ public class UserFacade {
         return ResponseEntity.ok(UserToUserRegisterDTO(userService.updateUser(user, authentication.getName())));
     }
 
-    public ResponseEntity<List<UserShortDTO>> getFollowers(Integer page, Integer size, Authentication authentication) {
-        return ResponseEntity.ok(userService.getFollowers(page, size, authentication.getName()));
+    public ResponseEntity<Void> deleteUser(Authentication authentication) {
+        userService.deleteUser(authentication.getName());
+        return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<Page<UserShortDTO>> searchUsers(Integer page, Integer size, String username, Authentication authentication) {
+        if (authentication == null) {
+            throw new NullTokenException("Token is null");
+        }
+        return ResponseEntity.ok(userService.searchUsers(page, size, username).map(this::UserToUserShortDTO));
+    }
+
+    private UserShortDTO UserToUserShortDTO(User user) {
+        UserShortDTO userShortDTO = new UserShortDTO();
+        BeanUtils.copyProperties(user, userShortDTO);
+        return userShortDTO;
     }
 }

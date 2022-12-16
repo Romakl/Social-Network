@@ -12,7 +12,9 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -93,17 +95,23 @@ public class UserService implements UserDetailsService {
         return emptyNames.toArray(result);
     }
 
-    public List<UserShortDTO> getFollowers(int page, int size, String username) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
-        List<UserShortDTO> following = new ArrayList<>();
-        List<Followers> followingList = followersRepo.findByFrom(user, pageRequest);
-        followingList.stream().map(Followers::getTo).forEach(user1 -> {
-            UserShortDTO personBasicPublicDTO = new UserShortDTO();
-            BeanUtils.copyProperties(user1, personBasicPublicDTO);
-            following.add(personBasicPublicDTO);
-        });
-        return following;
+
+
+    @Transactional
+    public void deleteUser(String name) {
+        User user = userRepo.findByUsername(name).orElseThrow(() -> new UsernameNotFoundException(name));
+        System.out.println(user.getUsername());
+        if (user.getIsDeleted()) {
+            userRepo.delete(user);
+        } else {
+            user.setIsDeleted(true);
+            userRepo.save(user);
+        }
+    }
+
+    public Page<User> searchUsers(Integer page, Integer size, String username) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
+        return userRepo.findByUsernameContainingIgnoreCaseOrderByUsernameAsc(username, pageable);
     }
 }
 

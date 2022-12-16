@@ -3,6 +3,7 @@ package com.romankliuiev.socialnetwork.web.user;
 import com.romankliuiev.socialnetwork.dto.user.UserRegisterDTO;
 import com.romankliuiev.socialnetwork.dto.user.UserShortDTO;
 import com.romankliuiev.socialnetwork.facade.UserFacade;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,38 +36,19 @@ public class UserController {
         return userFacade.updateUser(userRegisterDTO, authentication);
     }
 
-    @GetMapping("/followers")
-    public ResponseEntity<List<UserShortDTO>> getFollowers(
+    @GetMapping("/search-by-username")
+    public ResponseEntity<Page<UserShortDTO>> searchUsers(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam String username,
             Authentication authentication) {
-        return userFacade.getFollowers(page, size, authentication);
+        return userFacade.searchUsers(page, size, username, authentication);
     }
-//    @GetMapping("/following")
-//    public ResponseEntity<List<UserShortDTO>> getFollowing(
-//            @RequestParam(required = false, defaultValue = "1") Integer page,
-//            @RequestParam(required = false, defaultValue = "10") Integer size,
-//            Authentication authentication) {
-//        return userFacade.getFollowing(page, size, authentication);
-//    }
-//    @PatchMapping("/follow")
-//    public ResponseEntity<UserRegisterDTO> followUser(@RequestParam Long userId, Authentication authentication) {
-//        return userFacade.followUser(userId, authentication);
-//    }
-//
-//    @GetMapping("/search-by-username")
-//    public ResponseEntity<List<UserShortDTO>> searchUsers(
-//            @RequestParam(required = false, defaultValue = "1") Integer page,
-//            @RequestParam(required = false, defaultValue = "10") Integer size,
-//            @RequestParam String username,
-//            Authentication authentication) {
-//        return userFacade.searchUsers(page, size, username, authentication);
-//    }
-//
-//    @DeleteMapping
-//    public ResponseEntity<Void> deleteUser(Authentication authentication) {
-//        return userFacade.deleteUser(authentication);
-//    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUser(Authentication authentication) {
+        return userFacade.deleteUser(authentication);
+    }
 
 
 }

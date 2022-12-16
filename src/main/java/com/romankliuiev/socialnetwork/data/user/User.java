@@ -46,7 +46,7 @@ public class User {
     private String password;
 
     @ElementCollection(targetClass = RoleName.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "person_role", joinColumns = @JoinColumn(name = "person_id"))
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<RoleName> roles;
 
